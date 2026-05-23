@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>掼蛋高手练功房</title>
+  <link rel="stylesheet" href="style.css?v=4">
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body>
+  <div id="game-container">
+    <!-- 顶部信息栏 -->
+    <div id="top-bar">
+      <div class="top-bar-item">
+        <span class="label">🏆 级牌:</span>
+        <span class="value" id="level-display">2</span>
+      </div>
+      <div class="top-bar-item">
+        <span class="label">👥 你的队伍:</span>
+        <span class="value" id="team0-score">0</span>
+        <span class="label">| 对方:</span>
+        <span class="value" id="team1-score">0</span>
+      </div>
+      <div class="top-bar-item">
+        <span class="label">📊 局数:</span>
+        <span class="value" id="round-display">1</span>
+      </div>
+      <button id="btn-new-game">新一局</button>
+    </div>
+
+    <!-- 牌桌区域 -->
+    <div id="table-area">
+      <!-- 玩家2：队友（顶部） -->
+      <div id="player-2" class="player-info">
+        <div class="opponent-cards" id="player2-cards"></div>
+        <div class="name-tag partner">🤝 队友</div>
+        <div class="card-count" id="player2-count">27张</div>
+        <div class="trick-row" id="trick-player-2"></div>
+      </div>
+
+      <!-- 玩家1：对手1（右侧） -->
+      <div id="player-1" class="player-info player-side">
+        <div class="trick-row" id="trick-player-1"></div>
+        <div class="player-side-body">
+          <div class="opponent-cards" id="player1-cards"></div>
+          <div class="name-tag opponent">😈 电脑A</div>
+          <div class="card-count" id="player1-count">27张</div>
+        </div>
+      </div>
+
+      <!-- 玩家3：对手2（左侧） -->
+      <div id="player-3" class="player-info player-side">
+        <div class="player-side-body">
+          <div class="opponent-cards" id="player3-cards"></div>
+          <div class="name-tag opponent">💀 电脑B</div>
+          <div class="card-count" id="player3-count">27张</div>
+        </div>
+        <div class="trick-row" id="trick-player-3"></div>
+      </div>
+
+      <!-- 出牌记录（左上角） -->
+      <div id="play-log"><div id="play-log-content"></div></div>
+
+      <!-- 中央信息区（不含具体牌） -->
+      <div id="center-area">
+        <div id="turn-indicator">准备开始...</div>
+        <div id="game-status">等待发牌</div>
+      </div>
+
+      <!-- 玩家0：你（底部） -->
+      <div id="player-0">
+        <div class="trick-row" id="trick-player-0"></div>
+        <div class="player-label name-tag me">👤 你</div>
+        <div id="hand-area"></div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div id="controls">
+      <button class="btn btn-play" id="btn-play" disabled>出牌</button>
+      <button class="btn btn-pass" id="btn-pass" disabled>过牌</button>
+      <button class="btn btn-advisor" id="btn-advisor" disabled>💡 Advisor</button>
+      <button class="btn btn-sort" id="btn-sort" disabled>🀄 理牌</button>
+      <button class="btn btn-reset-sort" id="btn-reset-sort" style="display:none">↩ 恢复</button>
+    </div>
+  </div>
+
+  <!-- Advisor 弹窗 -->
+  <div id="advisor-overlay">
+    <div id="advisor-modal">
+      <h2>💡 Advisor 出牌建议</h2>
+      <div class="subtitle">点击任一建议自动选牌</div>
+      <div id="advisor-content"></div>
+      <button class="advisor-close-btn" id="advisor-close">关闭</button>
+    </div>
+  </div>
+
+  <!-- 游戏结束弹窗 -->
+  <div id="gameover-overlay">
+    <div id="gameover-modal">
+      <h2 id="gameover-title">🎉 游戏结束</h2>
+      <div class="winner-text" id="gameover-winner"></div>
+      <div class="finish-detail" id="gameover-detail"></div>
+      <button class="btn-restart" id="btn-restart">再来一局</button>
+    </div>
+  </div>
+
+  <!-- 消息通知 -->
+  <div id="message-toast"></div>
+
+  <!-- 快捷键帮助 -->
+  <div id="shortcuts-overlay">
+    <div id="shortcuts-modal">
+      <h2>⌨️ 快捷键</h2>
+      <table>
+        <tr><td><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></td><td>移动焦点选择牌</td></tr>
+        <tr><td><kbd>Space</kbd></td><td>选中/取消焦点牌</td></tr>
+        <tr><td><kbd>Enter</kbd></td><td>出牌</td></tr>
+        <tr><td><kbd>P</kbd></td><td>过牌</td></tr>
+        <tr><td><kbd>H</kbd></td><td>Advisor 建议（开关）</td></tr>
+        <tr><td><kbd>S</kbd></td><td>理牌 / 恢复（开关）</td></tr>
+        <tr><td><kbd>D</kbd></td><td>调试信息（复制到剪贴板+保存）</td></tr>
+        <tr><td><kbd>L</kbd></td><td>加载已保存的牌局</td></tr>
+        <tr><td><kbd>Q</kbd></td><td>翻看其他玩家未出的牌（开关）</td></tr>
+        <tr><td><kbd>/</kbd></td><td>本快捷键列表</td></tr>
+      </table>
+      <button class="advisor-close-btn" id="shortcuts-close">关闭</button>
+    </div>
+  </div>
+
+  <!-- 脚本 -->
+  <script src="game-engine.js?v=4"></script>
+  <script src="ai-player.js?v=4"></script>
+  <script src="advisor.js?v=4"></script>
+  <script src="ui-controller.js?v=4"></script>
+</body>
+</html>

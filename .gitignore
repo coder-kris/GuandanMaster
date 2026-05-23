@@ -1,0 +1,11 @@
+# WorkBuddy / CodeBuddy 配置
+.workbuddy/
+.codebuddy/
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志
+*.log
